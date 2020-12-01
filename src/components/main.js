@@ -16,6 +16,7 @@ import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
 
+
 const useStyles = makeStyles((theme) => ({
   layout: {
     width: 'auto',
@@ -117,6 +118,36 @@ export default function Main() {
     activeElements[index] = !activeElements[index];
     setActiveElements([...activeElements]);
   };
+
+  const getModule = () => {
+    var lst = ["4 Weeks", "6 Weeks", "8 weeks"]
+    return lst[selectedIndex];
+  }
+
+  const getDeliveryCost = () => {
+    var today = Date.now();
+    var deliveryDate = new Date(date);
+    var diff = (parseInt((deliveryDate - today) / (1000 * 60 * 60 * 24), 10));
+
+
+    if (diff < 7){
+      return '$' + 5000;
+    }
+    return '$'+ 1000;
+  }
+
+  const getResourceCost = () => {
+    var res = 0;
+    var x;
+    for (x in activeElements){
+      if (activeElements[x] === true){
+        res+= 1000;
+        console.log(x);
+      }
+
+    }
+    return '$'+res 
+  }
 
 
   if(activeStep === 0){
@@ -295,9 +326,6 @@ export default function Main() {
                     <ListItemText primary="QA Tester" />
                     </ListItem>
                   </List>
-
-
-
                 </div>
                 </React.Fragment>
                 <div className={classes.buttons}>
@@ -313,6 +341,70 @@ export default function Main() {
                   className={classes.button}
                   >
                   {activeStep === steps.length - 1 ? 'Donate' : 'Next'}
+                  </Button>
+                  </div>
+                  </React.Fragment>
+                  </Paper>
+                </main>
+        </React.Fragment>
+        );
+      }
+
+      else if (activeStep === 3){
+          return(
+            <React.Fragment>
+              <CssBaseline />
+              <main className={classes.layout}>
+                <Paper className={classes.paper}>
+                <Stepper activeStep={activeStep} className={classes.stepper}>
+                {steps.map((label) => (
+                  <Step key={label}>
+                  <StepLabel>{label}</StepLabel>
+                  </Step>
+                  ))}
+                </Stepper>
+                <React.Fragment>
+                <React.Fragment>
+                <Typography variant="h6" gutterBottom>
+                Review
+                </Typography>
+                <div className={classes.root}>
+                  <List disablePadding>
+                    <ListItem className={classes.listItem}>
+                      <ListItemText primary="Module Duration" />
+                      <Typography variant="subtitle1" className={classes.total}>
+                        {getModule()}
+                      </Typography>
+                    </ListItem>
+                    <ListItem className={classes.listItem}>
+                      <ListItemText primary="Delivery Fee" />
+                      <Typography variant="subtitle1" className={classes.total}>
+                        {getDeliveryCost()}
+                      </Typography>
+                    </ListItem>
+                    <ListItem className={classes.listItem}>
+                      <ListItemText primary="Resource Fee" />
+                      <Typography variant="subtitle1" className={classes.total}>
+                        {getResourceCost()}
+                      </Typography>
+                    </ListItem>
+                  </List>
+
+                </div>
+                </React.Fragment>
+                <div className={classes.buttons}>
+                {activeStep !== 0 && (
+                  <Button onClick={handleBack} className={classes.button}>
+                  Back
+                  </Button>
+                  )}
+                  <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={handleNext}
+                  className={classes.button}
+                  >
+                  {activeStep === steps.length - 1 ? 'Submit' : 'Next'}
                   </Button>
                   </div>
                   </React.Fragment>
