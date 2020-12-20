@@ -127,7 +127,7 @@ export default function Main() {
        }),
     };
 
-    fetch("http://localhost:3001/", requestOptions)
+    fetch("http://localhost:3001/update", requestOptions)
       .then((res) => res.json())
       .then(
         (result) => {
