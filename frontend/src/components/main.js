@@ -72,23 +72,22 @@ function useQuery() {
   return new URLSearchParams(useLocation().search);
 }
 
-export default function Main() {
+function repeatFalse(num){
+  return Array(num).fill(false);
+}
 
+export default function Main(props) {
+  //console.log(props.data);
+  var data = props.data;
 
+  //Allow multi select to work dynamically even when options are increased
   let today = new Date(Date.now());
-  today = today.toISOString().split('T')[0];
-  //console.log(today)
-
+  today = today.toISOString().split("T")[0];
   const classes = useStyles();
   const [activeStep, setActiveStep] = React.useState(0);
   const [selectedIndex, setSelectedIndex] = React.useState();
   const [date, setDate] = React.useState(today);
-  const [activeElements, setActiveElements] = React.useState([
-    false,
-    false,
-    false,
-    false,
-  ]);
+  const [activeElements, setActiveElements] = React.useState(repeatFalse(data.step3.options.length));
   let query = useQuery();
 
   //Handles sending informaiton to salesforce
@@ -165,8 +164,7 @@ export default function Main() {
   };
 
   const getModule = () => {
-    var lst = ["4 Weeks", "6 Weeks", "8 weeks"];
-    return lst[selectedIndex];
+    return '$' + data.step1.options[selectedIndex].value;
   };
 
   const getDeliveryCost = () => {
@@ -186,7 +184,7 @@ export default function Main() {
     var x;
     for (x in activeElements) {
       if (activeElements[x] === true) {
-        res += 1000;
+        res += data.step3.options[x].value;
         //console.log(x);
       }
     }
@@ -210,34 +208,25 @@ export default function Main() {
               <React.Fragment>
                 <React.Fragment>
                   <Typography variant="h6" gutterBottom>
-                    What modules are you looking to implement?
+                    {data.step1.question}
                   </Typography>
                   <div className={classes.root}>
                     <List component="nav" aria-label="main mailbox folders">
-                      <ListItem
-                        button
-                        className={classes.buttonGroup}
-                        selected={selectedIndex === 0}
-                        onClick={(event) => handleListItemClick(event, 0)}
-                      >
-                        <ListItemText primary="Gold" />
-                      </ListItem>
-                      <ListItem
-                        button
-                        className={classes.buttonGroup}
-                        selected={selectedIndex === 1}
-                        onClick={(event) => handleListItemClick(event, 1)}
-                      >
-                        <ListItemText primary="Silver" />
-                      </ListItem>
-                      <ListItem
-                        button
-                        className={classes.buttonGroup}
-                        selected={selectedIndex === 2}
-                        onClick={(event) => handleListItemClick(event, 2)}
-                      >
-                        <ListItemText primary="Bronze" />
-                      </ListItem>
+                      {data.step1.options.map(function (value, index) {
+                        return (
+                          <ListItem
+                            button
+                            key={index}
+                            className={classes.buttonGroup}
+                            selected={selectedIndex === index}
+                            onClick={(event) =>
+                              handleListItemClick(event, index)
+                            }
+                          >
+                            <ListItemText primary={value.string} />
+                          </ListItem>
+                        );
+                      })}
                     </List>
                   </div>
                 </React.Fragment>
@@ -278,7 +267,7 @@ export default function Main() {
             <React.Fragment>
               <React.Fragment>
                 <Typography variant="h6" gutterBottom>
-                  When are you expecting delivery?
+                  {data.step2.question}
                 </Typography>
                 <div className={classes.root}>
                   <form className={classes.container} noValidate>
@@ -331,42 +320,23 @@ export default function Main() {
             <React.Fragment>
               <React.Fragment>
                 <Typography variant="h6" gutterBottom>
-                  What resources do you believe you'll need?
+                  {data.step3.question}
                 </Typography>
                 <div className={classes.root}>
                   <List component="nav" aria-label="main mailbox folders">
-                    <ListItem
-                      button
-                      className={classes.buttonGroup}
-                      onClick={(event) => handleChanges(event, 0)}
-                      selected={activeElements[0]}
-                    >
-                      <ListItemText primary="Project Manager" />
-                    </ListItem>
-                    <ListItem
-                      button
-                      className={classes.buttonGroup}
-                      onClick={(event) => handleChanges(event, 1)}
-                      selected={activeElements[1]}
-                    >
-                      <ListItemText primary="Solution Architect" />
-                    </ListItem>
-                    <ListItem
-                      button
-                      onClick={(event) => handleChanges(event, 2)}
-                      className={classes.buttonGroup}
-                      selected={activeElements[2]}
-                    >
-                      <ListItemText primary="Implementation Manager" />
-                    </ListItem>
-                    <ListItem
-                      button
-                      onClick={(event) => handleChanges(event, 3)}
-                      className={classes.buttonGroup}
-                      selected={activeElements[3]}
-                    >
-                      <ListItemText primary="QA Tester" />
-                    </ListItem>
+                    {data.step3.options.map(function (value, index) {
+                      return (
+                        <ListItem
+                          button
+                          key={index}
+                          className={classes.buttonGroup}
+                          onClick={(event) => handleChanges(event, index)}
+                          selected={activeElements[index]}
+                        >
+                          <ListItemText primary={value.string} />
+                        </ListItem>
+                      );
+                    })}
                   </List>
                 </div>
               </React.Fragment>
@@ -411,19 +381,19 @@ export default function Main() {
                 <div className={classes.root}>
                   <List disablePadding>
                     <ListItem className={classes.listItem}>
-                      <ListItemText primary="Module Duration" />
+                      <ListItemText primary={data.step1.review} />
                       <Typography variant="subtitle1" className={classes.total}>
                         {getModule()}
                       </Typography>
                     </ListItem>
                     <ListItem className={classes.listItem}>
-                      <ListItemText primary="Delivery Fee" />
+                      <ListItemText primary={data.step2.review} />
                       <Typography variant="subtitle1" className={classes.total}>
                         {getDeliveryCost()}
                       </Typography>
                     </ListItem>
                     <ListItem className={classes.listItem}>
-                      <ListItemText primary="Resource Fee" />
+                      <ListItemText primary={data.step3.review} />
                       <Typography variant="subtitle1" className={classes.total}>
                         {getResourceCost()}
                       </Typography>
