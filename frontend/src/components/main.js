@@ -68,16 +68,21 @@ const useStyles = makeStyles((theme) => ({
 
 const steps = ["Step 1", "Step 2", "Step 3", "Step 4"];
 
-
 function useQuery() {
   return new URLSearchParams(useLocation().search);
 }
 
 export default function Main() {
+
+
+  let today = new Date(Date.now());
+  today = today.toISOString().split('T')[0];
+  //console.log(today)
+
   const classes = useStyles();
   const [activeStep, setActiveStep] = React.useState(0);
   const [selectedIndex, setSelectedIndex] = React.useState();
-  const [date, setDate] = React.useState("2020-12-08");
+  const [date, setDate] = React.useState(today);
   const [activeElements, setActiveElements] = React.useState([
     false,
     false,
@@ -85,7 +90,6 @@ export default function Main() {
     false,
   ]);
   let query = useQuery();
-
 
   //Handles sending informaiton to salesforce
   const onsubmit = () => {
@@ -117,14 +121,14 @@ export default function Main() {
     const requestOptions = {
       method: "POST",
       headers: {
-        "Accept": "application/json",
+        Accept: "application/json",
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ 
+      body: JSON.stringify({
         cId: cId,
         qId: qId,
-        qna: res
-       }),
+        qna: res,
+      }),
     };
 
     fetch("http://localhost:3001/update", requestOptions)
@@ -167,6 +171,7 @@ export default function Main() {
 
   const getDeliveryCost = () => {
     var today = Date.now();
+
     var deliveryDate = new Date(date);
     var diff = parseInt((deliveryDate - today) / (1000 * 60 * 60 * 24), 10);
 
