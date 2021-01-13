@@ -78,7 +78,13 @@ function repeatFalse(num){
 
 export default function Main(props) {
   //console.log(props.data);
+
+
   var data = props.data;
+
+  //DATA CHECK
+
+
 
   //Allow multi select to work dynamically even when options are increased
   let today = new Date(Date.now());
@@ -87,8 +93,34 @@ export default function Main(props) {
   const [activeStep, setActiveStep] = React.useState(0);
   const [selectedIndex, setSelectedIndex] = React.useState();
   const [date, setDate] = React.useState(today);
-  const [activeElements, setActiveElements] = React.useState(repeatFalse(data.step3.options.length));
+
+
+  var step3Options = 0;
+
+  //Handles case before data loads
+  if(data != null){
+    step3Options = data.step3.options.length;
+  }
+  const [activeElements, setActiveElements] = React.useState(repeatFalse(step3Options));
   let query = useQuery();
+
+
+
+  //Handles case before data loads 
+  
+  if (data === null){
+    return(
+      <Router>
+        <React.Fragment>
+          <CssBaseline />
+          <main className={classes.layout}>
+            <Paper className={classes.paper}>
+            </Paper>
+          </main>
+        </React.Fragment>
+      </Router>
+    )
+  }
 
   //Handles sending informaiton to salesforce
   const onsubmit = () => {
@@ -190,6 +222,8 @@ export default function Main(props) {
     }
     return "$" + res;
   };
+
+
 
   if (activeStep === 0) {
     return (
