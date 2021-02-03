@@ -18,7 +18,7 @@ function App() {
       };
       const prom = await fetch("http://localhost:3001/getdata", requestOptions);
       var res = await prom.json();
-      console.log(res);
+      //console.log(res);
       setData(res);
     }
     fetchData();
