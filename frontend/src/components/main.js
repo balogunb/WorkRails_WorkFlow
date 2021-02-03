@@ -176,7 +176,7 @@ export default function Main(props) {
   const onsubmit = () => {
     console.log("submitting");
 
-    //setActiveStep(activeStep + 1);
+    setActiveStep(activeStep + 1);
     //send information to salesforce
     var qId = query.get("qId");
     var cId = query.get("cId");
