@@ -86,6 +86,8 @@ export default function Main(props) {
   const classes = useStyles();
   const [activeStep, setActiveStep] = React.useState(0);
   const [selectedIndex, setSelectedIndex] = React.useState({});
+  const [selectedIndexStep1, setSelectedIndexStep1] = React.useState({});
+  const [selectedIndexStep3, setSelectedIndexStep3] = React.useState({});
   const [date, setDate] = React.useState(today);
 
   var step3Options = 0;
@@ -164,19 +166,22 @@ export default function Main(props) {
   };
 
   const handleListItemClick = (event, index,num) => {
-    //setSelectedIndex(index);
-    //console.log(num)
-    //console.log(index)
-
-
-    //var tmp = selectedIndex;
-    //tmp[num] = index;
-    
-
     setSelectedIndex({...selectedIndex,[num]:{
       value: index
     }})
     console.log(selectedIndex);
+  };
+
+  const handleListItemClickStep1 = (event, index,num) => {
+    setSelectedIndexStep1({...selectedIndexStep1,[num]:{
+      value: index
+    }})
+  };
+
+  const handleListItemClickStep3 = (event, index,num) => {
+    setSelectedIndexStep3({...selectedIndexStep3,[num]:{
+      value: index
+    }})
   };
 
   const handleNext = () => {
@@ -271,17 +276,17 @@ export default function Main(props) {
                             aria-label="main mailbox folders"
                           >
                             {value.options.map(function (value, index) {
-                              console.log(index)
-                              console.log(selectedIndex[num])
+                              //console.log(index)
+                              //console.log(selectedIndex[num])
                               return (
                                 <ListItem
                                   button
                                   key={index}
                                   name={num}
                                   className={classes.buttonGroup}
-                                  selected={selectedIndex[num] && selectedIndex[num].value === index}
+                                  selected={selectedIndexStep1[num] && selectedIndexStep1[num].value === index}
                                   onClick={(event) =>
-                                    handleListItemClick(event, index,num)
+                                    handleListItemClickStep1(event, index,num)
                                   }
                                 >
                                   <ListItemText primary={value.string} />
@@ -330,9 +335,6 @@ export default function Main(props) {
             </Stepper>
             <React.Fragment>
               {data.step2.map(function (value, num) {
-
-                
-                
                 if (value.information) {
                   return (
                     <div>
@@ -343,10 +345,6 @@ export default function Main(props) {
                     </div>
                   );
                 } else {
-
-
-                  
-
                   return (
                     <div>
                       <Typography variant="h6" gutterBottom>
@@ -359,7 +357,6 @@ export default function Main(props) {
                           console.log(index);
                           console.log(selectedIndex);
                           console.log("   ");
-                          
                           return (
                             <ListItem
                               button
@@ -418,11 +415,11 @@ export default function Main(props) {
             </Stepper>
             <React.Fragment>
             <React.Fragment>
-                  {data.step3.map(function (value, index) {
+                  {data.step3.map(function (value, num) {
                     if (value.information) {
                       return (
                         <div>
-                          <Typography variant="body1" gutterBottom key={index}>
+                          <Typography variant="body1" gutterBottom key={num}>
                             {value.information}
                             <Box m={2}></Box>
                           </Typography>
@@ -439,12 +436,18 @@ export default function Main(props) {
                           <List component="nav" aria-label="main mailbox folders">
                             {value.options.map(function (value, index) {
                               return (
-                                <ListItem button key={index} className={classes.buttonGroup} selected={selectedIndex === index}
+                                <ListItem
+                                  button
+                                  key={index}
+                                  name = {num}
+                                  className={classes.buttonGroup}
+                                  selected={selectedIndexStep3[num] && selectedIndexStep3[num].value === index}
                                   onClick={(event) =>
-                                    handleListItemClick(event, index)
+                                    handleListItemClickStep3(event, index,num)
                                   }
                                 >
                                   <ListItemText primary={value.string} />
+                                  <ListItemText primary={num} />
                                 </ListItem>
                               );
                             })}
