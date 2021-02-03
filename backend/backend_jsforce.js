@@ -2,7 +2,8 @@ function updateSalesForce(qId, cId, qna) {
     var jsforce = require('jsforce');
     var conn = new jsforce.Connection();
     require('dotenv').config()
-    conn.login(process.env.EMAIL, process.env.PASSWORD, function (err, res) {
+    var pword = process.env.PASSWORD + process.env.TOKEN;
+    conn.login(process.env.EMAIL, pword , function (err, res) {
         if (err) {
             console.log('Error Connecting')
             return console.error(err);
@@ -51,7 +52,7 @@ function updateSalesForce(qId, cId, qna) {
         //Create an opportunity
         var opportunity = {
             StageName: 'Proposal/Price Quote',
-            CloseDate: '2020-12-17',
+            CloseDate: '2021-01-03',
             Name: 'Demo Opportunity' + cId
         }
 

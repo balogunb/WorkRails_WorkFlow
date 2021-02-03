@@ -114,8 +114,6 @@ function getAns(
 
   data.step1.map(function name(value, index) {
     if (value.options) {
-      //console.log(value.options);
-      //console.log(value.options[selectedIndexStep1[index].value].string);
       ans.push(value.options[selectedIndexStep1[index].value].string);
     }
     return null;
@@ -176,11 +174,26 @@ export default function Main(props) {
 
   //Handles sending informaiton to salesforce
   const onsubmit = () => {
+    console.log("submitting");
+
+    //setActiveStep(activeStep + 1);
     //send information to salesforce
     var qId = query.get("qId");
     var cId = query.get("cId");
     console.log(qId);
     console.log(cId);
+
+    var finalData = [];
+
+    questions.forEach(function (value, index) {
+      var curr = {
+        question: value,
+        answer: answers[index],
+      };
+      finalData.push(curr);
+    });
+
+    console.log(finalData);
 
     const requestOptions = {
       method: "POST",
@@ -189,7 +202,9 @@ export default function Main(props) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        h: "d",
+        cId: cId,
+        qId: qId,
+        qna: finalData,
       }),
     };
 
@@ -554,21 +569,21 @@ export default function Main(props) {
                   Customer Info
                 </Typography>
                 <div className={classes.root}>
-                <List disablePadding>
-                        <ListItem className={classes.listItem}>
-                          <ListItemText primary="Name" />
-                          <Typography className={classes.total}>
-                            <Box fontWeight="900">Jack Rodgers</Box>
-                          </Typography>
-                        </ListItem>
-                        <ListItem className={classes.listItem}>
-                          <ListItemText primary="Customer Number" />
-                          <Typography className={classes.total}>
-                            <Box fontWeight="900">645</Box>
-                          </Typography>
-                        </ListItem>
+                  <List disablePadding>
+                    <ListItem className={classes.listItem}>
+                      <ListItemText primary="Name" />
+                      <Typography className={classes.total}>
+                        <Box fontWeight="900">Jack Rodgers</Box>
+                      </Typography>
+                    </ListItem>
+                    <ListItem className={classes.listItem}>
+                      <ListItemText primary="Customer Number" />
+                      <Typography className={classes.total}>
+                        <Box fontWeight="900">645</Box>
+                      </Typography>
+                    </ListItem>
                   </List>
-                  </div>
+                </div>
               </React.Fragment>
               <div className={classes.buttons}>
                 {activeStep !== 0 && (
@@ -579,7 +594,7 @@ export default function Main(props) {
                 <Button
                   variant="contained"
                   color="primary"
-                  onClick={onsubmit}
+                  onClick={(event) => onsubmit(answers)}
                   className={classes.button}
                 >
                   {activeStep === steps.length - 1 ? "Submit" : "Next"}
@@ -589,6 +604,26 @@ export default function Main(props) {
           </Paper>
         </main>
       </React.Fragment>
+    );
+  } else {
+    return (
+      <Router>
+        <React.Fragment>
+          <CssBaseline />
+          <main className={classes.layout}>
+            <Paper className={classes.paper}>
+              <Typography
+                variant="h3"
+                align="center"
+                color="primary"
+                gutterBottom
+              >
+                Thank you for submiting
+              </Typography>
+            </Paper>
+          </main>
+        </React.Fragment>
+      </Router>
     );
   }
 }
