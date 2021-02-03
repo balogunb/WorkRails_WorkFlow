@@ -9,7 +9,6 @@ import StepLabel from "@material-ui/core/StepLabel";
 import Button from "@material-ui/core/Button";
 import Typography from "@material-ui/core/Typography";
 import Box from "@material-ui/core/Box";
-import TextField from "@material-ui/core/TextField";
 import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemText from "@material-ui/core/ListItemText";
@@ -77,15 +76,78 @@ function repeatFalse(num) {
   return Array(num).fill(false);
 }
 
+function getQuestions(data) {
+  if (!data) return; //check if data has been loaded
+  var qsts = [];
+  data.step1.map(function name(value, index) {
+    if (value.question) {
+      qsts.push(value.question);
+    }
+    return null;
+  });
+
+  data.step2.map(function name(value, index) {
+    if (value.question) {
+      qsts.push(value.question);
+    }
+    return null;
+  });
+
+  data.step3.map(function name(value, index) {
+    if (value.question) {
+      qsts.push(value.question);
+    }
+    return null;
+  });
+  //qsts.forEach(element=> console.log(element));
+  return qsts;
+}
+
+function getAns(
+  data,
+  selectedIndexStep1,
+  selectedIndexStep2,
+  selectedIndexStep3
+) {
+  if (!data) return; //check if data has been loaded
+  var ans = [];
+
+  data.step1.map(function name(value, index) {
+    if (value.options) {
+      //console.log(value.options);
+      //console.log(value.options[selectedIndexStep1[index].value].string);
+      ans.push(value.options[selectedIndexStep1[index].value].string);
+    }
+    return null;
+  });
+
+  data.step2.map(function name(value, index) {
+    if (value.options) {
+      ans.push(value.options[selectedIndexStep2[index].value].string);
+    }
+    return null;
+  });
+
+  data.step3.map(function name(value, index) {
+    if (value.options) {
+      ans.push(value.options[selectedIndexStep3[index].value].string);
+    }
+    return null;
+  });
+  //ans.forEach(element=> console.log(element));
+  return ans;
+}
+
 export default function Main(props) {
   var data = props.data;
+  var questions = getQuestions(data);
 
   //Allow multi select to work dynamically even when options are increased
   let today = new Date(Date.now());
   today = today.toISOString().split("T")[0];
   const classes = useStyles();
   const [activeStep, setActiveStep] = React.useState(0);
-  const [selectedIndex, setSelectedIndex] = React.useState({});
+  const [selectedIndexStep2, setSelectedIndexStep2] = React.useState({});
   const [selectedIndexStep1, setSelectedIndexStep1] = React.useState({});
   const [selectedIndexStep3, setSelectedIndexStep3] = React.useState({});
   const [date, setDate] = React.useState(today);
@@ -93,7 +155,6 @@ export default function Main(props) {
   var step3Options = 0;
 
   //Handles case before data loads
-
   const [activeElements, setActiveElements] = React.useState(
     repeatFalse(step3Options)
   );
@@ -118,25 +179,6 @@ export default function Main(props) {
     //send information to salesforce
     var qId = query.get("qId");
     var cId = query.get("cId");
-
-    var res = [
-      {
-        question: "What modules are you looking to implement?",
-        answer: getModule(),
-      },
-      {
-        question: "When are you expecting delivery?",
-        answer: getDeliveryCost(),
-      },
-      {
-        question: "What resources do you believe you would need?",
-        answer: getResourceCost(),
-      },
-    ];
-
-    console.log(getModule());
-    console.log(getDeliveryCost());
-    console.log(getResourceCost());
     console.log(qId);
     console.log(cId);
 
@@ -147,9 +189,7 @@ export default function Main(props) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        cId: cId,
-        qId: qId,
-        qna: res,
+        h: "d",
       }),
     };
 
@@ -165,68 +205,39 @@ export default function Main(props) {
       );
   };
 
-  const handleListItemClick = (event, index,num) => {
-    setSelectedIndex({...selectedIndex,[num]:{
-      value: index
-    }})
-    console.log(selectedIndex);
+  const handleListItemClickStep1 = (event, index, num) => {
+    setSelectedIndexStep1({
+      ...selectedIndexStep1,
+      [num]: {
+        value: index,
+      },
+    });
   };
-
-  const handleListItemClickStep1 = (event, index,num) => {
-    setSelectedIndexStep1({...selectedIndexStep1,[num]:{
-      value: index
-    }})
+  const handleListItemClickStep2 = (event, index, num) => {
+    setSelectedIndexStep2({
+      ...selectedIndexStep2,
+      [num]: {
+        value: index,
+      },
+    });
   };
-
-  const handleListItemClickStep3 = (event, index,num) => {
-    setSelectedIndexStep3({...selectedIndexStep3,[num]:{
-      value: index
-    }})
+  const handleListItemClickStep3 = (event, index, num) => {
+    setSelectedIndexStep3({
+      ...selectedIndexStep3,
+      [num]: {
+        value: index,
+      },
+    });
   };
 
   const handleNext = () => {
     setActiveStep(activeStep + 1);
+    window.scrollTo(0, 0);
   };
 
   const handleBack = () => {
     setActiveStep(activeStep - 1);
-  };
-
-  const handleDate = (event) => {
-    setDate(event.target.value);
-  };
-
-  const handleChanges = (event, index) => {
-    activeElements[index] = !activeElements[index];
-    setActiveElements([...activeElements]);
-  };
-
-  const getModule = () => {
-    return "$" + data.step1.options[selectedIndex].value;
-  };
-
-  const getDeliveryCost = () => {
-    var today = Date.now();
-
-    var deliveryDate = new Date(date);
-    var diff = parseInt((deliveryDate - today) / (1000 * 60 * 60 * 24), 10);
-
-    if (diff < 7) {
-      return "$" + 5000;
-    }
-    return "$" + 1000;
-  };
-
-  const getResourceCost = () => {
-    var res = 0;
-    var x;
-    for (x in activeElements) {
-      if (activeElements[x] === true) {
-        res += data.step3.options[x].value;
-        //console.log(x);
-      }
-    }
-    return "$" + res;
+    window.scrollTo(0, 0);
   };
 
   if (activeStep === 0) {
@@ -276,17 +287,18 @@ export default function Main(props) {
                             aria-label="main mailbox folders"
                           >
                             {value.options.map(function (value, index) {
-                              //console.log(index)
-                              //console.log(selectedIndex[num])
                               return (
                                 <ListItem
                                   button
                                   key={index}
                                   name={num}
                                   className={classes.buttonGroup}
-                                  selected={selectedIndexStep1[num] && selectedIndexStep1[num].value === index}
+                                  selected={
+                                    selectedIndexStep1[num] &&
+                                    selectedIndexStep1[num].value === index
+                                  }
                                   onClick={(event) =>
-                                    handleListItemClickStep1(event, index,num)
+                                    handleListItemClickStep1(event, index, num)
                                   }
                                 >
                                   <ListItemText primary={value.string} />
@@ -326,6 +338,14 @@ export default function Main(props) {
         <CssBaseline />
         <main className={classes.layout}>
           <Paper className={classes.paper}>
+            <Typography
+              variant="h5"
+              align="center"
+              color="primary"
+              gutterBottom
+            >
+              {data.title}
+            </Typography>
             <Stepper activeStep={activeStep} className={classes.stepper}>
               {steps.map((label) => (
                 <Step key={label}>
@@ -352,24 +372,21 @@ export default function Main(props) {
                       </Typography>
                       <List component="nav" aria-label="main mailbox folders">
                         {value.options.map(function (value, index) {
-                          console.log(num);
-                          //console.log(value);
-                          console.log(index);
-                          console.log(selectedIndex);
-                          console.log("   ");
                           return (
                             <ListItem
                               button
                               key={index}
-                              name = {num}
+                              name={num}
                               className={classes.buttonGroup}
-                              selected={selectedIndex[num] && selectedIndex[num].value === index}
+                              selected={
+                                selectedIndexStep2[num] &&
+                                selectedIndexStep2[num].value === index
+                              }
                               onClick={(event) =>
-                                handleListItemClick(event, index,num)
+                                handleListItemClickStep2(event, index, num)
                               }
                             >
                               <ListItemText primary={value.string} />
-                              <ListItemText primary={num} />
                             </ListItem>
                           );
                         })}
@@ -406,6 +423,14 @@ export default function Main(props) {
         <CssBaseline />
         <main className={classes.layout}>
           <Paper className={classes.paper}>
+            <Typography
+              variant="h5"
+              align="center"
+              color="primary"
+              gutterBottom
+            >
+              {data.title}
+            </Typography>
             <Stepper activeStep={activeStep} className={classes.stepper}>
               {steps.map((label) => (
                 <Step key={label}>
@@ -414,49 +439,51 @@ export default function Main(props) {
               ))}
             </Stepper>
             <React.Fragment>
-            <React.Fragment>
-                  {data.step3.map(function (value, num) {
-                    if (value.information) {
-                      return (
-                        <div>
-                          <Typography variant="body1" gutterBottom key={num}>
-                            {value.information}
-                            <Box m={2}></Box>
-                          </Typography>
-                        </div>
-                      );
-                    } else {
-                      return (
-                        <div>
-                          <Typography variant="h6" gutterBottom>
-                            <Box fontWeight="fontWeightBold">
-                              {value.question}
-                            </Box>
-                          </Typography>
-                          <List component="nav" aria-label="main mailbox folders">
-                            {value.options.map(function (value, index) {
-                              return (
-                                <ListItem
-                                  button
-                                  key={index}
-                                  name = {num}
-                                  className={classes.buttonGroup}
-                                  selected={selectedIndexStep3[num] && selectedIndexStep3[num].value === index}
-                                  onClick={(event) =>
-                                    handleListItemClickStep3(event, index,num)
-                                  }
-                                >
-                                  <ListItemText primary={value.string} />
-                                  <ListItemText primary={num} />
-                                </ListItem>
-                              );
-                            })}
-                          </List>
-                        </div>
-                      );
-                    }
-                  })}
-                </React.Fragment>
+              <React.Fragment>
+                {data.step3.map(function (value, num) {
+                  if (value.information) {
+                    return (
+                      <div>
+                        <Typography variant="body1" gutterBottom key={num}>
+                          {value.information}
+                          <Box m={2}></Box>
+                        </Typography>
+                      </div>
+                    );
+                  } else {
+                    return (
+                      <div>
+                        <Typography variant="h6" gutterBottom>
+                          <Box fontWeight="fontWeightBold">
+                            {value.question}
+                          </Box>
+                        </Typography>
+                        <List component="nav" aria-label="main mailbox folders">
+                          {value.options.map(function (value, index) {
+                            return (
+                              <ListItem
+                                button
+                                key={index}
+                                name={num}
+                                className={classes.buttonGroup}
+                                selected={
+                                  selectedIndexStep3[num] &&
+                                  selectedIndexStep3[num].value === index
+                                }
+                                onClick={(event) =>
+                                  handleListItemClickStep3(event, index, num)
+                                }
+                              >
+                                <ListItemText primary={value.string} />
+                              </ListItem>
+                            );
+                          })}
+                        </List>
+                      </div>
+                    );
+                  }
+                })}
+              </React.Fragment>
               <div className={classes.buttons}>
                 {activeStep !== 0 && (
                   <Button onClick={handleBack} className={classes.button}>
@@ -478,11 +505,25 @@ export default function Main(props) {
       </React.Fragment>
     );
   } else if (activeStep === 3) {
+    var answers = getAns(
+      data,
+      selectedIndexStep1,
+      selectedIndexStep2,
+      selectedIndexStep3
+    );
     return (
       <React.Fragment>
         <CssBaseline />
         <main className={classes.layout}>
           <Paper className={classes.paper}>
+            <Typography
+              variant="h5"
+              align="center"
+              color="primary"
+              gutterBottom
+            >
+              {data.title}
+            </Typography>
             <Stepper activeStep={activeStep} className={classes.stepper}>
               {steps.map((label) => (
                 <Step key={label}>
@@ -497,26 +538,37 @@ export default function Main(props) {
                 </Typography>
                 <div className={classes.root}>
                   <List disablePadding>
-                    <ListItem className={classes.listItem}>
-                      <ListItemText primary={data.step1.review} />
-                      <Typography variant="subtitle1" className={classes.total}>
-                        {getModule()}
-                      </Typography>
-                    </ListItem>
-                    <ListItem className={classes.listItem}>
-                      <ListItemText primary={data.step2.review} />
-                      <Typography variant="subtitle1" className={classes.total}>
-                        {getDeliveryCost()}
-                      </Typography>
-                    </ListItem>
-                    <ListItem className={classes.listItem}>
-                      <ListItemText primary={data.step3.review} />
-                      <Typography variant="subtitle1" className={classes.total}>
-                        {getResourceCost()}
-                      </Typography>
-                    </ListItem>
+                    {questions.map(function (value, index) {
+                      return (
+                        <ListItem className={classes.listItem}>
+                          <ListItemText primary={value} />
+                          <Typography className={classes.total}>
+                            <Box fontWeight="900">{answers[index]}</Box>
+                          </Typography>
+                        </ListItem>
+                      );
+                    })}
                   </List>
                 </div>
+                <Typography variant="h6" gutterBottom>
+                  Customer Info
+                </Typography>
+                <div className={classes.root}>
+                <List disablePadding>
+                        <ListItem className={classes.listItem}>
+                          <ListItemText primary="Name" />
+                          <Typography className={classes.total}>
+                            <Box fontWeight="900">Jack Rodgers</Box>
+                          </Typography>
+                        </ListItem>
+                        <ListItem className={classes.listItem}>
+                          <ListItemText primary="Customer Number" />
+                          <Typography className={classes.total}>
+                            <Box fontWeight="900">645</Box>
+                          </Typography>
+                        </ListItem>
+                  </List>
+                  </div>
               </React.Fragment>
               <div className={classes.buttons}>
                 {activeStep !== 0 && (
