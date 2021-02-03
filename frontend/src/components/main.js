@@ -80,14 +80,12 @@ function repeatFalse(num) {
 export default function Main(props) {
   var data = props.data;
 
-  //DATA CHECK
-
   //Allow multi select to work dynamically even when options are increased
   let today = new Date(Date.now());
   today = today.toISOString().split("T")[0];
   const classes = useStyles();
   const [activeStep, setActiveStep] = React.useState(0);
-  const [selectedIndex, setSelectedIndex] = React.useState();
+  const [selectedIndex, setSelectedIndex] = React.useState({});
   const [date, setDate] = React.useState(today);
 
   var step3Options = 0;
@@ -165,8 +163,20 @@ export default function Main(props) {
       );
   };
 
-  const handleListItemClick = (event, index) => {
-    setSelectedIndex(index);
+  const handleListItemClick = (event, index,num) => {
+    //setSelectedIndex(index);
+    //console.log(num)
+    //console.log(index)
+
+
+    //var tmp = selectedIndex;
+    //tmp[num] = index;
+    
+
+    setSelectedIndex({...selectedIndex,[num]:{
+      value: index
+    }})
+    console.log(selectedIndex);
   };
 
   const handleNext = () => {
@@ -221,7 +231,12 @@ export default function Main(props) {
           <CssBaseline />
           <main className={classes.layout}>
             <Paper className={classes.paper}>
-              <Typography variant="h5" align="center" color="primary" gutterBottom>
+              <Typography
+                variant="h5"
+                align="center"
+                color="primary"
+                gutterBottom
+              >
                 {data.title}
               </Typography>
               <Stepper activeStep={activeStep} className={classes.stepper}>
@@ -233,11 +248,11 @@ export default function Main(props) {
               </Stepper>
               <React.Fragment>
                 <React.Fragment>
-                  {data.step1.map(function (value, index) {
+                  {data.step1.map(function (value, num) {
                     if (value.information) {
                       return (
                         <div>
-                          <Typography variant="body1" gutterBottom key={index}>
+                          <Typography variant="body1" gutterBottom key={num}>
                             {value.information}
                             <Box m={2}></Box>
                           </Typography>
@@ -251,12 +266,22 @@ export default function Main(props) {
                               {value.question}
                             </Box>
                           </Typography>
-                          <List component="nav" aria-label="main mailbox folders">
+                          <List
+                            component="nav"
+                            aria-label="main mailbox folders"
+                          >
                             {value.options.map(function (value, index) {
+                              console.log(index)
+                              console.log(selectedIndex[num])
                               return (
-                                <ListItem button key={index} className={classes.buttonGroup} selected={selectedIndex === index}
+                                <ListItem
+                                  button
+                                  key={index}
+                                  name={num}
+                                  className={classes.buttonGroup}
+                                  selected={selectedIndex[num] && selectedIndex[num].value === index}
                                   onClick={(event) =>
-                                    handleListItemClick(event, index)
+                                    handleListItemClick(event, index,num)
                                   }
                                 >
                                   <ListItemText primary={value.string} />
@@ -304,43 +329,59 @@ export default function Main(props) {
               ))}
             </Stepper>
             <React.Fragment>
-                  {data.step2.map(function (value, index) {
-                    if (value.information) {
-                      return (
-                        <div>
-                          <Typography variant="body1" gutterBottom key={index}>
-                            {value.information}
-                            <Box m={2}></Box>
-                          </Typography>
-                        </div>
-                      );
-                    } else {
-                      return (
-                        <div>
-                          <Typography variant="h6" gutterBottom>
-                            <Box fontWeight="fontWeightBold">
-                              {value.question}
-                            </Box>
-                          </Typography>
-                          <List component="nav" aria-label="main mailbox folders">
-                            {value.options.map(function (value, index) {
-                              return (
-                                <ListItem button key={index} className={classes.buttonGroup} selected={selectedIndex === index}
-                                  onClick={(event) =>
-                                    handleListItemClick(event, index)
-                                  }
-                                >
-                                  <ListItemText primary={value.string} />
-                                </ListItem>
-                              );
-                            })}
-                          </List>
-                        </div>
-                      );
-                    }
-                  })}
-                </React.Fragment>
+              {data.step2.map(function (value, num) {
 
+                
+                
+                if (value.information) {
+                  return (
+                    <div>
+                      <Typography variant="body1" gutterBottom key={num}>
+                        {value.information}
+                        <Box m={2}></Box>
+                      </Typography>
+                    </div>
+                  );
+                } else {
+
+
+                  
+
+                  return (
+                    <div>
+                      <Typography variant="h6" gutterBottom>
+                        <Box fontWeight="fontWeightBold">{value.question}</Box>
+                      </Typography>
+                      <List component="nav" aria-label="main mailbox folders">
+                        {value.options.map(function (value, index) {
+                          console.log(num);
+                          //console.log(value);
+                          console.log(index);
+                          console.log(selectedIndex);
+                          console.log("   ");
+                          
+                          return (
+                            <ListItem
+                              button
+                              key={index}
+                              name = {num}
+                              className={classes.buttonGroup}
+                              selected={selectedIndex[num] && selectedIndex[num].value === index}
+                              onClick={(event) =>
+                                handleListItemClick(event, index,num)
+                              }
+                            >
+                              <ListItemText primary={value.string} />
+                              <ListItemText primary={num} />
+                            </ListItem>
+                          );
+                        })}
+                      </List>
+                    </div>
+                  );
+                }
+              })}
+            </React.Fragment>
             <React.Fragment>
               <div className={classes.buttons}>
                 {activeStep !== 0 && (
@@ -376,28 +417,43 @@ export default function Main(props) {
               ))}
             </Stepper>
             <React.Fragment>
-              <React.Fragment>
-                <Typography variant="h6" gutterBottom>
-                  {data.step3.question}
-                </Typography>
-                <div className={classes.root}>
-                  <List component="nav" aria-label="main mailbox folders">
-                    {data.step3.options.map(function (value, index) {
+            <React.Fragment>
+                  {data.step3.map(function (value, index) {
+                    if (value.information) {
                       return (
-                        <ListItem
-                          button
-                          key={index}
-                          className={classes.buttonGroup}
-                          onClick={(event) => handleChanges(event, index)}
-                          selected={activeElements[index]}
-                        >
-                          <ListItemText primary={value.string} />
-                        </ListItem>
+                        <div>
+                          <Typography variant="body1" gutterBottom key={index}>
+                            {value.information}
+                            <Box m={2}></Box>
+                          </Typography>
+                        </div>
                       );
-                    })}
-                  </List>
-                </div>
-              </React.Fragment>
+                    } else {
+                      return (
+                        <div>
+                          <Typography variant="h6" gutterBottom>
+                            <Box fontWeight="fontWeightBold">
+                              {value.question}
+                            </Box>
+                          </Typography>
+                          <List component="nav" aria-label="main mailbox folders">
+                            {value.options.map(function (value, index) {
+                              return (
+                                <ListItem button key={index} className={classes.buttonGroup} selected={selectedIndex === index}
+                                  onClick={(event) =>
+                                    handleListItemClick(event, index)
+                                  }
+                                >
+                                  <ListItemText primary={value.string} />
+                                </ListItem>
+                              );
+                            })}
+                          </List>
+                        </div>
+                      );
+                    }
+                  })}
+                </React.Fragment>
               <div className={classes.buttons}>
                 {activeStep !== 0 && (
                   <Button onClick={handleBack} className={classes.button}>
