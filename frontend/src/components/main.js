@@ -8,7 +8,7 @@ import Step from "@material-ui/core/Step";
 import StepLabel from "@material-ui/core/StepLabel";
 import Button from "@material-ui/core/Button";
 import Typography from "@material-ui/core/Typography";
-import TextField from "@material-ui/core/TextField";
+import Box from "@material-ui/core/Box";
 import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemText from "@material-ui/core/ListItemText";
@@ -18,8 +18,8 @@ const useStyles = makeStyles((theme) => ({
     width: "auto",
     marginLeft: theme.spacing(2),
     marginRight: theme.spacing(2),
-    [theme.breakpoints.up(600 + theme.spacing(2) * 2)]: {
-      width: 600,
+    [theme.breakpoints.up(800 + theme.spacing(2) * 2)]: {
+      width: 800,
       marginLeft: "auto",
       marginRight: "auto",
     },
@@ -72,82 +72,128 @@ function useQuery() {
   return new URLSearchParams(useLocation().search);
 }
 
-function repeatFalse(num){
+function repeatFalse(num) {
   return Array(num).fill(false);
 }
 
+function getQuestions(data) {
+  if (!data) return; //check if data has been loaded
+  var qsts = [];
+  data.step1.map(function name(value, index) {
+    if (value.question) {
+      qsts.push(value.question);
+    }
+    return null;
+  });
+
+  data.step2.map(function name(value, index) {
+    if (value.question) {
+      qsts.push(value.question);
+    }
+    return null;
+  });
+
+  data.step3.map(function name(value, index) {
+    if (value.question) {
+      qsts.push(value.question);
+    }
+    return null;
+  });
+  //qsts.forEach(element=> console.log(element));
+  return qsts;
+}
+
+function getAns(
+  data,
+  selectedIndexStep1,
+  selectedIndexStep2,
+  selectedIndexStep3
+) {
+  if (!data) return; //check if data has been loaded
+  var ans = [];
+
+  data.step1.map(function name(value, index) {
+    if (value.options) {
+      ans.push(value.options[selectedIndexStep1[index].value].string);
+    }
+    return null;
+  });
+
+  data.step2.map(function name(value, index) {
+    if (value.options) {
+      ans.push(value.options[selectedIndexStep2[index].value].string);
+    }
+    return null;
+  });
+
+  data.step3.map(function name(value, index) {
+    if (value.options) {
+      ans.push(value.options[selectedIndexStep3[index].value].string);
+    }
+    return null;
+  });
+  //ans.forEach(element=> console.log(element));
+  return ans;
+}
+
 export default function Main(props) {
-  //console.log(props.data);
-
-
   var data = props.data;
-
-  //DATA CHECK
-
-
+  var questions = getQuestions(data);
 
   //Allow multi select to work dynamically even when options are increased
   let today = new Date(Date.now());
   today = today.toISOString().split("T")[0];
   const classes = useStyles();
   const [activeStep, setActiveStep] = React.useState(0);
-  const [selectedIndex, setSelectedIndex] = React.useState();
+  const [selectedIndexStep2, setSelectedIndexStep2] = React.useState({});
+  const [selectedIndexStep1, setSelectedIndexStep1] = React.useState({});
+  const [selectedIndexStep3, setSelectedIndexStep3] = React.useState({});
   const [date, setDate] = React.useState(today);
-
 
   var step3Options = 0;
 
   //Handles case before data loads
-  if(data != null){
-    step3Options = data.step3.options.length;
-  }
-  const [activeElements, setActiveElements] = React.useState(repeatFalse(step3Options));
+  const [activeElements, setActiveElements] = React.useState(
+    repeatFalse(step3Options)
+  );
   let query = useQuery();
 
-
-
-  //Handles case before data loads 
-  
-  if (data === null){
-    return(
+  //Handles case before data loads
+  if (data === null) {
+    return (
       <Router>
         <React.Fragment>
           <CssBaseline />
           <main className={classes.layout}>
-            <Paper className={classes.paper}>
-            </Paper>
+            <Paper className={classes.paper}></Paper>
           </main>
         </React.Fragment>
       </Router>
-    )
+    );
   }
 
   //Handles sending informaiton to salesforce
   const onsubmit = () => {
+    console.log("submitting");
+
+    //setActiveStep(activeStep + 1);
     //send information to salesforce
     var qId = query.get("qId");
     var cId = query.get("cId");
-
-    var res = [
-      {
-        question: "What modules are you looking to implement?",
-        answer: getModule(),
-      },
-      {
-        question: "When are you expecting delivery?",
-        answer: getDeliveryCost(),
-      },
-      {
-        question: "What resources do you believe you would need?",
-        answer: getResourceCost(),
-      },
-    ];
-
-    console.log(getModule());
-    console.log(getDeliveryCost());
-    console.log(getResourceCost());
     console.log(qId);
     console.log(cId);
+
+    var finalData = [];
+
+    questions.forEach(function (value, index) {
+      var curr = {
+        question: value,
+        answer: answers[index],
+      };
+      finalData.push(curr);
+    });
+
+    console.log(finalData);
 
     const requestOptions = {
       method: "POST",
@@ -158,7 +204,7 @@ export default function Main(props) {
       body: JSON.stringify({
         cId: cId,
         qId: qId,
-        qna: res,
+        qna: finalData,
       }),
     };
 
@@ -174,56 +220,40 @@ export default function Main(props) {
       );
   };
 
-  const handleListItemClick = (event, index) => {
-    setSelectedIndex(index);
+  const handleListItemClickStep1 = (event, index, num) => {
+    setSelectedIndexStep1({
+      ...selectedIndexStep1,
+      [num]: {
+        value: index,
+      },
+    });
+  };
+  const handleListItemClickStep2 = (event, index, num) => {
+    setSelectedIndexStep2({
+      ...selectedIndexStep2,
+      [num]: {
+        value: index,
+      },
+    });
+  };
+  const handleListItemClickStep3 = (event, index, num) => {
+    setSelectedIndexStep3({
+      ...selectedIndexStep3,
+      [num]: {
+        value: index,
+      },
+    });
   };
 
   const handleNext = () => {
     setActiveStep(activeStep + 1);
+    window.scrollTo(0, 0);
   };
 
   const handleBack = () => {
     setActiveStep(activeStep - 1);
+    window.scrollTo(0, 0);
   };
-
-  const handleDate = (event) => {
-    setDate(event.target.value);
-  };
-
-  const handleChanges = (event, index) => {
-    activeElements[index] = !activeElements[index];
-    setActiveElements([...activeElements]);
-  };
-
-  const getModule = () => {
-    return '$' + data.step1.options[selectedIndex].value;
-  };
-
-  const getDeliveryCost = () => {
-    var today = Date.now();
-
-    var deliveryDate = new Date(date);
-    var diff = parseInt((deliveryDate - today) / (1000 * 60 * 60 * 24), 10);
-
-    if (diff < 7) {
-      return "$" + 5000;
-    }
-    return "$" + 1000;
-  };
-
-  const getResourceCost = () => {
-    var res = 0;
-    var x;
-    for (x in activeElements) {
-      if (activeElements[x] === true) {
-        res += data.step3.options[x].value;
-        //console.log(x);
-      }
-    }
-    return "$" + res;
-  };
-
-
 
   if (activeStep === 0) {
     return (
@@ -232,6 +262,14 @@ export default function Main(props) {
           <CssBaseline />
           <main className={classes.layout}>
             <Paper className={classes.paper}>
+              <Typography
+                variant="h5"
+                align="center"
+                color="primary"
+                gutterBottom
+              >
+                {data.title}
+              </Typography>
               <Stepper activeStep={activeStep} className={classes.stepper}>
                 {steps.map((label) => (
                   <Step key={label}>
@@ -241,28 +279,52 @@ export default function Main(props) {
               </Stepper>
               <React.Fragment>
                 <React.Fragment>
-                  <Typography variant="h6" gutterBottom>
-                    {data.step1.question}
-                  </Typography>
-                  <div className={classes.root}>
-                    <List component="nav" aria-label="main mailbox folders">
-                      {data.step1.options.map(function (value, index) {
-                        return (
-                          <ListItem
-                            button
-                            key={index}
-                            className={classes.buttonGroup}
-                            selected={selectedIndex === index}
-                            onClick={(event) =>
-                              handleListItemClick(event, index)
-                            }
+                  {data.step1.map(function (value, num) {
+                    if (value.information) {
+                      return (
+                        <div>
+                          <Typography variant="body1" gutterBottom key={num}>
+                            {value.information}
+                            <Box m={2}></Box>
+                          </Typography>
+                        </div>
+                      );
+                    } else {
+                      return (
+                        <div>
+                          <Typography variant="h6" gutterBottom>
+                            <Box fontWeight="fontWeightBold">
+                              {value.question}
+                            </Box>
+                          </Typography>
+                          <List
+                            component="nav"
+                            aria-label="main mailbox folders"
                           >
-                            <ListItemText primary={value.string} />
-                          </ListItem>
-                        );
-                      })}
-                    </List>
-                  </div>
+                            {value.options.map(function (value, index) {
+                              return (
+                                <ListItem
+                                  button
+                                  key={index}
+                                  name={num}
+                                  className={classes.buttonGroup}
+                                  selected={
+                                    selectedIndexStep1[num] &&
+                                    selectedIndexStep1[num].value === index
+                                  }
+                                  onClick={(event) =>
+                                    handleListItemClickStep1(event, index, num)
+                                  }
+                                >
+                                  <ListItemText primary={value.string} />
+                                </ListItem>
+                              );
+                            })}
+                          </List>
+                        </div>
+                      );
+                    }
+                  })}
                 </React.Fragment>
                 <div className={classes.buttons}>
                   {activeStep !== 0 && (
@@ -291,6 +353,14 @@ export default function Main(props) {
         <CssBaseline />
         <main className={classes.layout}>
           <Paper className={classes.paper}>
+            <Typography
+              variant="h5"
+              align="center"
+              color="primary"
+              gutterBottom
+            >
+              {data.title}
+            </Typography>
             <Stepper activeStep={activeStep} className={classes.stepper}>
               {steps.map((label) => (
                 <Step key={label}>
@@ -299,25 +369,49 @@ export default function Main(props) {
               ))}
             </Stepper>
             <React.Fragment>
-              <React.Fragment>
-                <Typography variant="h6" gutterBottom>
-                  {data.step2.question}
-                </Typography>
-                <div className={classes.root}>
-                  <form className={classes.container} noValidate>
-                    <TextField
-                      id="date"
-                      type="date"
-                      value={date}
-                      onChange={handleDate}
-                      className={classes.textField}
-                      InputLabelProps={{
-                        shrink: true,
-                      }}
-                    />
-                  </form>
-                </div>
-              </React.Fragment>
+              {data.step2.map(function (value, num) {
+                if (value.information) {
+                  return (
+                    <div>
+                      <Typography variant="body1" gutterBottom key={num}>
+                        {value.information}
+                        <Box m={2}></Box>
+                      </Typography>
+                    </div>
+                  );
+                } else {
+                  return (
+                    <div>
+                      <Typography variant="h6" gutterBottom>
+                        <Box fontWeight="fontWeightBold">{value.question}</Box>
+                      </Typography>
+                      <List component="nav" aria-label="main mailbox folders">
+                        {value.options.map(function (value, index) {
+                          return (
+                            <ListItem
+                              button
+                              key={index}
+                              name={num}
+                              className={classes.buttonGroup}
+                              selected={
+                                selectedIndexStep2[num] &&
+                                selectedIndexStep2[num].value === index
+                              }
+                              onClick={(event) =>
+                                handleListItemClickStep2(event, index, num)
+                              }
+                            >
+                              <ListItemText primary={value.string} />
+                            </ListItem>
+                          );
+                        })}
+                      </List>
+                    </div>
+                  );
+                }
+              })}
+            </React.Fragment>
+            <React.Fragment>
               <div className={classes.buttons}>
                 {activeStep !== 0 && (
                   <Button onClick={handleBack} className={classes.button}>
@@ -344,6 +438,14 @@ export default function Main(props) {
         <CssBaseline />
         <main className={classes.layout}>
           <Paper className={classes.paper}>
+            <Typography
+              variant="h5"
+              align="center"
+              color="primary"
+              gutterBottom
+            >
+              {data.title}
+            </Typography>
             <Stepper activeStep={activeStep} className={classes.stepper}>
               {steps.map((label) => (
                 <Step key={label}>
@@ -353,26 +455,49 @@ export default function Main(props) {
             </Stepper>
             <React.Fragment>
               <React.Fragment>
-                <Typography variant="h6" gutterBottom>
-                  {data.step3.question}
-                </Typography>
-                <div className={classes.root}>
-                  <List component="nav" aria-label="main mailbox folders">
-                    {data.step3.options.map(function (value, index) {
-                      return (
-                        <ListItem
-                          button
-                          key={index}
-                          className={classes.buttonGroup}
-                          onClick={(event) => handleChanges(event, index)}
-                          selected={activeElements[index]}
-                        >
-                          <ListItemText primary={value.string} />
-                        </ListItem>
-                      );
-                    })}
-                  </List>
-                </div>
+                {data.step3.map(function (value, num) {
+                  if (value.information) {
+                    return (
+                      <div>
+                        <Typography variant="body1" gutterBottom key={num}>
+                          {value.information}
+                          <Box m={2}></Box>
+                        </Typography>
+                      </div>
+                    );
+                  } else {
+                    return (
+                      <div>
+                        <Typography variant="h6" gutterBottom>
+                          <Box fontWeight="fontWeightBold">
+                            {value.question}
+                          </Box>
+                        </Typography>
+                        <List component="nav" aria-label="main mailbox folders">
+                          {value.options.map(function (value, index) {
+                            return (
+                              <ListItem
+                                button
+                                key={index}
+                                name={num}
+                                className={classes.buttonGroup}
+                                selected={
+                                  selectedIndexStep3[num] &&
+                                  selectedIndexStep3[num].value === index
+                                }
+                                onClick={(event) =>
+                                  handleListItemClickStep3(event, index, num)
+                                }
+                              >
+                                <ListItemText primary={value.string} />
+                              </ListItem>
+                            );
+                          })}
+                        </List>
+                      </div>
+                    );
+                  }
+                })}
               </React.Fragment>
               <div className={classes.buttons}>
                 {activeStep !== 0 && (
@@ -395,11 +520,25 @@ export default function Main(props) {
       </React.Fragment>
     );
   } else if (activeStep === 3) {
+    var answers = getAns(
+      data,
+      selectedIndexStep1,
+      selectedIndexStep2,
+      selectedIndexStep3
+    );
     return (
       <React.Fragment>
         <CssBaseline />
         <main className={classes.layout}>
           <Paper className={classes.paper}>
+            <Typography
+              variant="h5"
+              align="center"
+              color="primary"
+              gutterBottom
+            >
+              {data.title}
+            </Typography>
             <Stepper activeStep={activeStep} className={classes.stepper}>
               {steps.map((label) => (
                 <Step key={label}>
@@ -414,22 +553,33 @@ export default function Main(props) {
                 </Typography>
                 <div className={classes.root}>
                   <List disablePadding>
+                    {questions.map(function (value, index) {
+                      return (
+                        <ListItem className={classes.listItem}>
+                          <ListItemText primary={value} />
+                          <Typography className={classes.total}>
+                            <Box fontWeight="900">{answers[index]}</Box>
+                          </Typography>
+                        </ListItem>
+                      );
+                    })}
+                  </List>
+                </div>
+                <Typography variant="h6" gutterBottom>
+                  Customer Info
+                </Typography>
+                <div className={classes.root}>
+                  <List disablePadding>
                     <ListItem className={classes.listItem}>
-                      <ListItemText primary={data.step1.review} />
-                      <Typography variant="subtitle1" className={classes.total}>
-                        {getModule()}
+                      <ListItemText primary="Name" />
+                      <Typography className={classes.total}>
+                        <Box fontWeight="900">Jack Rodgers</Box>
                       </Typography>
                     </ListItem>
                     <ListItem className={classes.listItem}>
-                      <ListItemText primary={data.step2.review} />
-                      <Typography variant="subtitle1" className={classes.total}>
-                        {getDeliveryCost()}
-                      </Typography>
-                    </ListItem>
-                    <ListItem className={classes.listItem}>
-                      <ListItemText primary={data.step3.review} />
-                      <Typography variant="subtitle1" className={classes.total}>
-                        {getResourceCost()}
+                      <ListItemText primary="Customer Number" />
+                      <Typography className={classes.total}>
+                        <Box fontWeight="900">645</Box>
                       </Typography>
                     </ListItem>
                   </List>
@@ -444,7 +594,7 @@ export default function Main(props) {
                 <Button
                   variant="contained"
                   color="primary"
-                  onClick={onsubmit}
+                  onClick={(event) => onsubmit(answers)}
                   className={classes.button}
                 >
                   {activeStep === steps.length - 1 ? "Submit" : "Next"}
@@ -454,6 +604,26 @@ export default function Main(props) {
           </Paper>
         </main>
       </React.Fragment>
+    );
+  } else {
+    return (
+      <Router>
+        <React.Fragment>
+          <CssBaseline />
+          <main className={classes.layout}>
+            <Paper className={classes.paper}>
+              <Typography
+                variant="h3"
+                align="center"
+                color="primary"
+                gutterBottom
+              >
+                Thank you for submiting
+              </Typography>
+            </Paper>
+          </main>
+        </React.Fragment>
+      </Router>
     );
   }
 }
