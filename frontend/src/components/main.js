@@ -19,8 +19,8 @@ import FormControlLabel from "@material-ui/core/FormControlLabel";
 import FormControl from "@material-ui/core/FormControl";
 import FormLabel from "@material-ui/core/FormLabel";
 
-import TextField from '@material-ui/core/TextField';
-import MenuItem from '@material-ui/core/MenuItem';
+import TextField from "@material-ui/core/TextField";
+import MenuItem from "@material-ui/core/MenuItem";
 
 const useStyles = makeStyles((theme) => ({
   layout: {
@@ -58,30 +58,36 @@ const useStyles = makeStyles((theme) => ({
     width: "100%",
     color: "#858585",
   },
-  shortText:{
-    '& > *': {
+  shortText: {
+    "& > *": {
       margin: theme.spacing(0),
-      width: '70ch',
+      width: "70ch",
+      marginBottom: theme.spacing(3),
     },
   },
-  longText:{
-    '& > *': {
+  longText: {
+    "& > *": {
       margin: theme.spacing(0),
-      width: '90ch',
+      width: "90ch",
+      marginBottom: theme.spacing(3),
     },
   },
-  dropDown:{
-    '& > *': {
+  dropDown: {
+    "& > *": {
       margin: theme.spacing(0),
-      width: '40ch',
+      width: "40ch",
+      marginBottom: theme.spacing(3),
     },
   },
-  
+
   buttonGroup: {
     width: "100%",
     height: 60,
     backgroundColor: "#F6F6F6",
     margin: "10px 0",
+  },
+  buttonGroupList: {
+    marginBottom: theme.spacing(3),
   },
   radioGroup: {
     width: "100%",
@@ -90,6 +96,7 @@ const useStyles = makeStyles((theme) => ({
     "&$checked": {
       color: "#EFFBFF",
     },
+    marginBottom: theme.spacing(3),
   },
   container: {
     display: "flex",
@@ -172,7 +179,7 @@ function getAns(
   return ans;
 }
 
-function buttonList(
+function ButtonList(
   data,
   value,
   num,
@@ -181,7 +188,7 @@ function buttonList(
   handleListItemClickStep1
 ) {
   return (
-    <List component="nav" aria-label="main mailbox folders">
+    <List component="nav" className={classes.buttonGroupList} aria-label="main mailbox folders">
       {value.options.map(function (value, index) {
         return (
           <ListItem
@@ -202,7 +209,7 @@ function buttonList(
   );
 }
 
-function dropDownList(
+function DropDownList(
   data,
   value,
   num,
@@ -212,33 +219,32 @@ function dropDownList(
 ) {
   return (
     <TextField
-          id="drop-down"
-          select
-          className={classes.dropDown}
-          defaultValue="Pick from dropdown"
-          
-        >
+      id="drop-down"
+      select
+      className={classes.dropDown}
+      defaultValue="Pick from dropdown"
+    >
       {value.options.map(function (value, index) {
         return (
-          <MenuItem 
-            key={index} 
-            value={value.string} 
+          <MenuItem
+            key={index}
+            value={value.string}
             name={num}
             className={classes.dropDown}
             selected={
               selectedIndexStep1[num] && selectedIndexStep1[num].value === index
             }
             onChange={(event) => handleListItemClickStep1(event, index, num)}
-             >
-              {value.string} 
-            </MenuItem>
+          >
+            {value.string}
+          </MenuItem>
         );
       })}
     </TextField>
   );
 }
 
-function datePicker(
+function DatePicker(
   data,
   value,
   num,
@@ -246,35 +252,27 @@ function datePicker(
   selectedIndexStep1,
   handleListItemClickStep1
 ) {
+  let today = new Date(Date.now());
+  today = today.toISOString().split("T")[0];
+
   return (
-    <TextField
-          id="drop-down"
-          select
-          className={classes.dropDown}
-          defaultValue="Pick from dropdown"
-          
-        >
-      {value.options.map(function (value, index) {
-        return (
-          <MenuItem 
-            key={index} 
-            value={value.string} 
-            name={num}
-            className={classes.dropDown}
-            selected={
-              selectedIndexStep1[num] && selectedIndexStep1[num].value === index
-            }
-            onChange={(event) => handleListItemClickStep1(event, index, num)}
-             >
-              {value.string} 
-            </MenuItem>
-        );
-      })}
-    </TextField>
+    <div className={classes.buttonGroupList}>
+      <form className={classes.container} noValidate>
+        <TextField
+          id="date"
+          type="date"
+          value={today}
+          className={classes.textField}
+          InputLabelProps={{
+            shrink: true,
+          }}
+        />
+      </form>
+    </div>
   );
 }
 
-function radioList(
+function RadioList(
   data,
   value,
   num,
@@ -284,7 +282,7 @@ function radioList(
 ) {
   return (
     <FormControl component="nav" aria-label="main mailbox folders">
-      <RadioGroup>
+      <RadioGroup className={classes.radioGroup}>
         {value.options.map(function (value, index) {
           return (
             <FormControlLabel
@@ -293,7 +291,7 @@ function radioList(
               name={num}
               control={<Radio />}
               label={value.string}
-              className={classes.radioGroup}
+              
               checked={
                 selectedIndexStep1[num] &&
                 selectedIndexStep1[num].value === index
@@ -309,7 +307,7 @@ function radioList(
   );
 }
 
-function shortTextField(
+function ShortTextField(
   data,
   value,
   num,
@@ -319,12 +317,12 @@ function shortTextField(
 ) {
   return (
     <form className={classes.shortText} noValidate autoComplete="off">
-      <TextField id="outlined-basic"  variant="filled"/>
+      <TextField id="outlined-basic" variant="filled" />
     </form>
   );
 }
 
-function longTextField(
+function LongTextField(
   data,
   value,
   num,
@@ -334,7 +332,12 @@ function longTextField(
 ) {
   return (
     <form className={classes.longText} noValidate autoComplete="off">
-      <TextField id="filled-multiline-static" multiline rows={10} variant="filled"/>
+      <TextField
+        id="filled-multiline-static"
+        multiline
+        rows={10}
+        variant="filled"
+      />
     </form>
   );
 }
@@ -492,7 +495,7 @@ export default function Main(props) {
                           </Typography>
                         </div>
                       );
-                    } else {
+                    } else if (value.type === "ButtonList") {
                       return (
                         <div>
                           <Typography variant="h6" gutterBottom>
@@ -500,7 +503,97 @@ export default function Main(props) {
                               {value.question}
                             </Box>
                           </Typography>
-                          {dropDownList(
+                          {ButtonList(
+                            data,
+                            value,
+                            num,
+                            classes,
+                            selectedIndexStep1,
+                            handleListItemClickStep1
+                          )}
+                        </div>
+                      );
+                    } else if (value.type === "DropDownList") {
+                      return (
+                        <div>
+                          <Typography variant="h6" gutterBottom>
+                            <Box fontWeight="fontWeightBold">
+                              {value.question}
+                            </Box>
+                          </Typography>
+                          {DropDownList(
+                            data,
+                            value,
+                            num,
+                            classes,
+                            selectedIndexStep1,
+                            handleListItemClickStep1
+                          )}
+                        </div>
+                      );
+                    } else if (value.type === "DatePicker") {
+                      return (
+                        <div>
+                          <Typography variant="h6" gutterBottom>
+                            <Box fontWeight="fontWeightBold">
+                              {value.question}
+                            </Box>
+                          </Typography>
+                          {DatePicker(
+                            data,
+                            value,
+                            num,
+                            classes,
+                            selectedIndexStep1,
+                            handleListItemClickStep1
+                          )}
+                        </div>
+                      );
+                    } else if (value.type === "RadioList") {
+                      return (
+                        <div>
+                          <Typography variant="h6" gutterBottom>
+                            <Box fontWeight="fontWeightBold">
+                              {value.question}
+                            </Box>
+                          </Typography>
+                          {RadioList(
+                            data,
+                            value,
+                            num,
+                            classes,
+                            selectedIndexStep1,
+                            handleListItemClickStep1
+                          )}
+                        </div>
+                      );
+                    } else if (value.type === "ShortTextField") {
+                      return (
+                        <div>
+                          <Typography variant="h6" gutterBottom>
+                            <Box fontWeight="fontWeightBold">
+                              {value.question}
+                            </Box>
+                          </Typography>
+                          {ShortTextField(
+                            data,
+                            value,
+                            num,
+                            classes,
+                            selectedIndexStep1,
+                            handleListItemClickStep1
+                          )}
+                        </div>
+                      );
+                    } else if (value.type === "LongTextField") {
+                      return (
+                        <div>
+                          <Typography variant="h6" gutterBottom>
+                            <Box fontWeight="fontWeightBold">
+                              {value.question}
+                            </Box>
+                          </Typography>
+                          {LongTextField(
                             data,
                             value,
                             num,
@@ -566,13 +659,105 @@ export default function Main(props) {
                       </Typography>
                     </div>
                   );
-                } else {
+                } else if (value.type === "ButtonList") {
                   return (
                     <div>
                       <Typography variant="h6" gutterBottom>
-                        <Box fontWeight="fontWeightBold">{value.question}</Box>
+                        <Box fontWeight="fontWeightBold">
+                          {value.question}
+                        </Box>
                       </Typography>
-                      {buttonList(
+                      {ButtonList(
+                        data,
+                        value,
+                        num,
+                        classes,
+                        selectedIndexStep2,
+                        handleListItemClickStep2
+                      )}
+                    </div>
+                  );
+                } else if (value.type === "DropDownList") {
+                  return (
+                    <div>
+                      <Typography variant="h6" gutterBottom>
+                        <Box fontWeight="fontWeightBold">
+                          {value.question}
+                        </Box>
+                      </Typography>
+                      {DropDownList(
+                        data,
+                        value,
+                        num,
+                        classes,
+                        selectedIndexStep2,
+                        handleListItemClickStep2
+                      )}
+                    </div>
+                  );
+                } else if (value.type === "DatePicker") {
+                  return (
+                    <div>
+                      <Typography variant="h6" gutterBottom>
+                        <Box fontWeight="fontWeightBold">
+                          {value.question}
+                        </Box>
+                      </Typography>
+                      {DatePicker(
+                        data,
+                        value,
+                        num,
+                        classes,
+                        selectedIndexStep2,
+                        handleListItemClickStep2
+                      )}
+                    </div>
+                  );
+                } else if (value.type === "RadioList") {
+                  return (
+                    <div>
+                      <Typography variant="h6" gutterBottom>
+                        <Box fontWeight="fontWeightBold">
+                          {value.question}
+                        </Box>
+                      </Typography>
+                      {RadioList(
+                        data,
+                        value,
+                        num,
+                        classes,
+                        selectedIndexStep2,
+                        handleListItemClickStep2
+                      )}
+                    </div>
+                  );
+                } else if (value.type === "ShortTextField") {
+                  return (
+                    <div>
+                      <Typography variant="h6" gutterBottom>
+                        <Box fontWeight="fontWeightBold">
+                          {value.question}
+                        </Box>
+                      </Typography>
+                      {ShortTextField(
+                        data,
+                        value,
+                        num,
+                        classes,
+                        selectedIndexStep2,
+                        handleListItemClickStep2
+                      )}
+                    </div>
+                  );
+                } else if (value.type === "LongTextField") {
+                  return (
+                    <div>
+                      <Typography variant="h6" gutterBottom>
+                        <Box fontWeight="fontWeightBold">
+                          {value.question}
+                        </Box>
+                      </Typography>
+                      {LongTextField(
                         data,
                         value,
                         num,
@@ -639,7 +824,7 @@ export default function Main(props) {
                         </Typography>
                       </div>
                     );
-                  } else {
+                  } else if (value.type === "ButtonList") {
                     return (
                       <div>
                         <Typography variant="h6" gutterBottom>
@@ -647,7 +832,97 @@ export default function Main(props) {
                             {value.question}
                           </Box>
                         </Typography>
-                        {buttonList(
+                        {ButtonList(
+                          data,
+                          value,
+                          num,
+                          classes,
+                          selectedIndexStep3,
+                          handleListItemClickStep3
+                        )}
+                      </div>
+                    );
+                  } else if (value.type === "DropDownList") {
+                    return (
+                      <div>
+                        <Typography variant="h6" gutterBottom>
+                          <Box fontWeight="fontWeightBold">
+                            {value.question}
+                          </Box>
+                        </Typography>
+                        {DropDownList(
+                          data,
+                          value,
+                          num,
+                          classes,
+                          selectedIndexStep3,
+                          handleListItemClickStep3
+                        )}
+                      </div>
+                    );
+                  } else if (value.type === "DatePicker") {
+                    return (
+                      <div>
+                        <Typography variant="h6" gutterBottom>
+                          <Box fontWeight="fontWeightBold">
+                            {value.question}
+                          </Box>
+                        </Typography>
+                        {DatePicker(
+                          data,
+                          value,
+                          num,
+                          classes,
+                          selectedIndexStep3,
+                          handleListItemClickStep3
+                        )}
+                      </div>
+                    );
+                  } else if (value.type === "RadioList") {
+                    return (
+                      <div>
+                        <Typography variant="h6" gutterBottom>
+                          <Box fontWeight="fontWeightBold">
+                            {value.question}
+                          </Box>
+                        </Typography>
+                        {RadioList(
+                          data,
+                          value,
+                          num,
+                          classes,
+                          selectedIndexStep3,
+                          handleListItemClickStep3
+                        )}
+                      </div>
+                    );
+                  } else if (value.type === "ShortTextField") {
+                    return (
+                      <div>
+                        <Typography variant="h6" gutterBottom>
+                          <Box fontWeight="fontWeightBold">
+                            {value.question}
+                          </Box>
+                        </Typography>
+                        {ShortTextField(
+                          data,
+                          value,
+                          num,
+                          classes,
+                          selectedIndexStep3,
+                          handleListItemClickStep3
+                        )}
+                      </div>
+                    );
+                  } else if (value.type === "LongTextField") {
+                    return (
+                      <div>
+                        <Typography variant="h6" gutterBottom>
+                          <Box fontWeight="fontWeightBold">
+                            {value.question}
+                          </Box>
+                        </Typography>
+                        {LongTextField(
                           data,
                           value,
                           num,

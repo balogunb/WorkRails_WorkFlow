@@ -19,6 +19,29 @@ var data = {
         },
         {
             "question": "What can we help you with?",
+            "type": "RadioList",
+            "options": [{
+                    "string": "Service Packages",
+                    "value": 0
+                },
+                {
+                    "string": "Enterprise T&M Consulting",
+                    "value": 0
+                },
+                {
+                    "string": "Projects",
+                    "value": 0
+                },
+                {
+                    "string": "Managed Services",
+                    "value": 0
+                },
+
+            ]
+        },
+        {
+            "question": "What can we help you with?",
+            "type": "ButtonList",
             "options": [{
                     "string": "Service Packages",
                     "value": 0
@@ -38,10 +61,28 @@ var data = {
 
             ]
         }
-        
+
     ],
     "step2": [{
             "question": "What are your SLA requirements?",
+            "type": "DropDownList",
+            "options": [{
+                    "string": "95%",
+                    "value": 6000
+                },
+                {
+                    "string": "99%",
+                    "value": 1000
+                },
+                {
+                    "string": "99.5%",
+                    "value": 4000
+                },
+            ],
+        },
+        {
+            "question": "When do you want it Delivered?",
+            "type": "DatePicker",
             "options": [{
                     "string": "95%",
                     "value": 6000
@@ -58,6 +99,7 @@ var data = {
         },
         {
             "question": "What is the size of the data being hosted?",
+            "type": "RadioList",
             "options": [{
                     "string": "< 1 TB",
                     "value": 6000
@@ -74,6 +116,7 @@ var data = {
         },
         {
             "question": "Are you using any specialty server roles?",
+            "type": "LongTextField",
             "options": [{
                     "string": "Image Server",
                     "value": 6000
@@ -91,6 +134,7 @@ var data = {
     ],
     "step3": [{
             "question": "How many concurrent user will be accessing the system?",
+            "type": "ShortTextField",
             "options": [{
                     "string": "< 10",
                     "value": 6000
@@ -107,6 +151,7 @@ var data = {
         },
         {
             "question": "What is the average \"think time\" a user will spend on the interface before issuing the next request to the service?",
+            "type": "RadioList",
             "options": [{
                     "string": "6+",
                     "value": 6000
@@ -123,6 +168,7 @@ var data = {
         },
         {
             "question": "Are there any IT security policies or technology standards that should be considered?",
+            "type": "ButtonList",
             "options": [{
                     "string": "No",
                     "value": 6000
