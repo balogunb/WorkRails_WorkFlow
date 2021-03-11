@@ -35,8 +35,10 @@ var data = {
                     "string": "Managed Services",
                     "value": 0
                 },
+
             ]
         }
+        
     ],
     "step2": [{
             "question": "What are your SLA requirements?",

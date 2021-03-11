@@ -13,6 +13,15 @@ import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemText from "@material-ui/core/ListItemText";
 
+import RadioGroup from "@material-ui/core/RadioGroup";
+import Radio from "@material-ui/core/Radio";
+import FormControlLabel from "@material-ui/core/FormControlLabel";
+import FormControl from "@material-ui/core/FormControl";
+import FormLabel from "@material-ui/core/FormLabel";
+
+import TextField from '@material-ui/core/TextField';
+import MenuItem from '@material-ui/core/MenuItem';
+
 const useStyles = makeStyles((theme) => ({
   layout: {
     width: "auto",
@@ -49,11 +58,38 @@ const useStyles = makeStyles((theme) => ({
     width: "100%",
     color: "#858585",
   },
+  shortText:{
+    '& > *': {
+      margin: theme.spacing(0),
+      width: '70ch',
+    },
+  },
+  longText:{
+    '& > *': {
+      margin: theme.spacing(0),
+      width: '90ch',
+    },
+  },
+  dropDown:{
+    '& > *': {
+      margin: theme.spacing(0),
+      width: '40ch',
+    },
+  },
+  
   buttonGroup: {
     width: "100%",
     height: 60,
     backgroundColor: "#F6F6F6",
     margin: "10px 0",
+  },
+  radioGroup: {
+    width: "100%",
+    color: "#858585",
+    margin: ".1px 0",
+    "&$checked": {
+      color: "#EFFBFF",
+    },
   },
   container: {
     display: "flex",
@@ -134,6 +170,173 @@ function getAns(
   });
   //ans.forEach(element=> console.log(element));
   return ans;
+}
+
+function buttonList(
+  data,
+  value,
+  num,
+  classes,
+  selectedIndexStep1,
+  handleListItemClickStep1
+) {
+  return (
+    <List component="nav" aria-label="main mailbox folders">
+      {value.options.map(function (value, index) {
+        return (
+          <ListItem
+            button
+            key={index}
+            name={num}
+            className={classes.buttonGroup}
+            selected={
+              selectedIndexStep1[num] && selectedIndexStep1[num].value === index
+            }
+            onClick={(event) => handleListItemClickStep1(event, index, num)}
+          >
+            <ListItemText primary={value.string} />
+          </ListItem>
+        );
+      })}
+    </List>
+  );
+}
+
+function dropDownList(
+  data,
+  value,
+  num,
+  classes,
+  selectedIndexStep1,
+  handleListItemClickStep1
+) {
+  return (
+    <TextField
+          id="drop-down"
+          select
+          className={classes.dropDown}
+          defaultValue="Pick from dropdown"
+          
+        >
+      {value.options.map(function (value, index) {
+        return (
+          <MenuItem 
+            key={index} 
+            value={value.string} 
+            name={num}
+            className={classes.dropDown}
+            selected={
+              selectedIndexStep1[num] && selectedIndexStep1[num].value === index
+            }
+            onChange={(event) => handleListItemClickStep1(event, index, num)}
+             >
+              {value.string} 
+            </MenuItem>
+        );
+      })}
+    </TextField>
+  );
+}
+
+function datePicker(
+  data,
+  value,
+  num,
+  classes,
+  selectedIndexStep1,
+  handleListItemClickStep1
+) {
+  return (
+    <TextField
+          id="drop-down"
+          select
+          className={classes.dropDown}
+          defaultValue="Pick from dropdown"
+          
+        >
+      {value.options.map(function (value, index) {
+        return (
+          <MenuItem 
+            key={index} 
+            value={value.string} 
+            name={num}
+            className={classes.dropDown}
+            selected={
+              selectedIndexStep1[num] && selectedIndexStep1[num].value === index
+            }
+            onChange={(event) => handleListItemClickStep1(event, index, num)}
+             >
+              {value.string} 
+            </MenuItem>
+        );
+      })}
+    </TextField>
+  );
+}
+
+function radioList(
+  data,
+  value,
+  num,
+  classes,
+  selectedIndexStep1,
+  handleListItemClickStep1
+) {
+  return (
+    <FormControl component="nav" aria-label="main mailbox folders">
+      <RadioGroup>
+        {value.options.map(function (value, index) {
+          return (
+            <FormControlLabel
+              button
+              value={index}
+              name={num}
+              control={<Radio />}
+              label={value.string}
+              className={classes.radioGroup}
+              checked={
+                selectedIndexStep1[num] &&
+                selectedIndexStep1[num].value === index
+              }
+              onChange={(event) => handleListItemClickStep1(event, index, num)}
+            >
+              <ListItemText primary={value.string} />
+            </FormControlLabel>
+          );
+        })}
+      </RadioGroup>
+    </FormControl>
+  );
+}
+
+function shortTextField(
+  data,
+  value,
+  num,
+  classes,
+  selectedIndexStep1,
+  handleListItemClickStep1
+) {
+  return (
+    <form className={classes.shortText} noValidate autoComplete="off">
+      <TextField id="outlined-basic"  variant="filled"/>
+    </form>
+  );
+}
+
+function longTextField(
+  data,
+  value,
+  num,
+  classes,
+  selectedIndexStep1,
+  handleListItemClickStep1
+) {
+  return (
+    <form className={classes.longText} noValidate autoComplete="off">
+      <TextField id="filled-multiline-static" multiline rows={10} variant="filled"/>
+    </form>
+  );
 }
 
 export default function Main(props) {
@@ -297,30 +500,14 @@ export default function Main(props) {
                               {value.question}
                             </Box>
                           </Typography>
-                          <List
-                            component="nav"
-                            aria-label="main mailbox folders"
-                          >
-                            {value.options.map(function (value, index) {
-                              return (
-                                <ListItem
-                                  button
-                                  key={index}
-                                  name={num}
-                                  className={classes.buttonGroup}
-                                  selected={
-                                    selectedIndexStep1[num] &&
-                                    selectedIndexStep1[num].value === index
-                                  }
-                                  onClick={(event) =>
-                                    handleListItemClickStep1(event, index, num)
-                                  }
-                                >
-                                  <ListItemText primary={value.string} />
-                                </ListItem>
-                              );
-                            })}
-                          </List>
+                          {dropDownList(
+                            data,
+                            value,
+                            num,
+                            classes,
+                            selectedIndexStep1,
+                            handleListItemClickStep1
+                          )}
                         </div>
                       );
                     }
@@ -385,27 +572,14 @@ export default function Main(props) {
                       <Typography variant="h6" gutterBottom>
                         <Box fontWeight="fontWeightBold">{value.question}</Box>
                       </Typography>
-                      <List component="nav" aria-label="main mailbox folders">
-                        {value.options.map(function (value, index) {
-                          return (
-                            <ListItem
-                              button
-                              key={index}
-                              name={num}
-                              className={classes.buttonGroup}
-                              selected={
-                                selectedIndexStep2[num] &&
-                                selectedIndexStep2[num].value === index
-                              }
-                              onClick={(event) =>
-                                handleListItemClickStep2(event, index, num)
-                              }
-                            >
-                              <ListItemText primary={value.string} />
-                            </ListItem>
-                          );
-                        })}
-                      </List>
+                      {buttonList(
+                        data,
+                        value,
+                        num,
+                        classes,
+                        selectedIndexStep2,
+                        handleListItemClickStep2
+                      )}
                     </div>
                   );
                 }
@@ -473,27 +647,14 @@ export default function Main(props) {
                             {value.question}
                           </Box>
                         </Typography>
-                        <List component="nav" aria-label="main mailbox folders">
-                          {value.options.map(function (value, index) {
-                            return (
-                              <ListItem
-                                button
-                                key={index}
-                                name={num}
-                                className={classes.buttonGroup}
-                                selected={
-                                  selectedIndexStep3[num] &&
-                                  selectedIndexStep3[num].value === index
-                                }
-                                onClick={(event) =>
-                                  handleListItemClickStep3(event, index, num)
-                                }
-                              >
-                                <ListItemText primary={value.string} />
-                              </ListItem>
-                            );
-                          })}
-                        </List>
+                        {buttonList(
+                          data,
+                          value,
+                          num,
+                          classes,
+                          selectedIndexStep3,
+                          handleListItemClickStep3
+                        )}
                       </div>
                     );
                   }

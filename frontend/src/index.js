@@ -11,7 +11,7 @@ const theme = createMuiTheme({
       main: "#048CBA", // This is an orange looking color
     },
     secondary: {
-      main: "#2bff55", //Another orange-ish color
+      main: "#048CBA", //Another orange-ish color
     },
   },
   overrides: {
